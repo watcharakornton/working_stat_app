@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import dataRoutes from './routes/dataRoutes.js'
 
 dotenv.config();
