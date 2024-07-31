@@ -3,3 +3,5 @@ node_modules/
 
 #ignore configuration file
 .env
+
+.DS_Store
