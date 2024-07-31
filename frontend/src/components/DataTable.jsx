@@ -12,6 +12,7 @@ const DataTable = ({ allData }) => {
             <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Month</th>
             <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Year</th>
             <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sale Status</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody className="bg-gray-800 divide-y divide-gray-700">
