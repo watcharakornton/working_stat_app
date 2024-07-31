@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import mongoose from 'mongoose';
 
 import dataRoutes from './routes/dataRoutes.js';
@@ -15,6 +16,15 @@ const port = process.env.PORT || 4001;
 
 app.use(bodyParser.json());
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: 'GET, POST, PUT, DELETE',
+  credentials: true
+}))
+
+app.get('/', (req, res) => {
+  res.send('Hello');
+})
 app.use('/api', dataRoutes);
 app.use('/password', passwordRoutes);
 
