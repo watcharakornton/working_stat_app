@@ -23,7 +23,7 @@ app.use(cors({
 }))
 
 app.get('/', (req, res) => {
-  res.send('Hello');
+  res.send('Hello, World');
 })
 app.use('/api', dataRoutes);
 app.use('/password', passwordRoutes);
