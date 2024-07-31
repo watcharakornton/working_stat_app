@@ -1,4 +1,5 @@
 import Data from '../models/dataModel.js';
+import Password from '../models/passwordModel.js';
 
 export const addData = async (req, res) => {
     const { type, name, category, month, saleStatus } = req.body;
@@ -79,19 +80,24 @@ export const editData = async (req, res) => {
 export const deleteData = async (req, res) => {
   const { id, password } = req.body;
 
-  if (password !== process.env.DELETE_PASSWORD) {
-    return res.status(401).json({ error: 'รหัสผ่านไม่ถูกต้อง!' });
-  }
-
   try {
+    // get password from db
+    const validPasswords = await Password.find();
+    const passwordExists = validPasswords.some(pwd => pwd.password === password);
+
+    if (!passwordExists) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
     const deletedData = await Data.findByIdAndDelete(id);
 
     if (!deletedData) {
-      return res.status(404).json({ error: 'Data not found' });
+      return res.status(404).json({ error: 'Data not found' })
     }
 
     res.json({ message: 'ลบข้อมูลสำเร็จ!' });
   } catch (error) {
+    console.error('Error deleting data', error);
     res.status(500).json({ error: 'Failed to delete data' });
   }
 };
