@@ -1,122 +1,97 @@
-import { loadData, saveData } from '../utils/dataUtils.js';
+import Data from '../models/dataModel.js';
 
-export const addData = (req, res) => {
+export const addData = async (req, res) => {
     const { type, name, category, month, saleStatus } = req.body;
 
     if (!['Change Request', 'Sitemap', 'Cms Training'].includes(type)) {
         return res.status(400).json({ error: 'Invalid type' });
     }
+    
+  try {
+    const newEntry = new Data({
+      type,
+      name: name.toUpperCase(),
+      category,
+      month,
+      year: new Date().getFullYear(),
+      saleStatus: type === 'Sitemap' ? saleStatus : null
+    });
 
-    const data = loadData();
-    const newEntry = {
+    await newEntry.save();
+    res.json({ message: 'เพิ่มข้อมูลสำเร็จ!', data: newEntry });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add data' });
+  }
+};
+
+export const viewAllData = async (req, res) => {
+  try {
+    const data = await Data.find();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch data' });
+  }
+};
+
+export const viewSummary = async (req, res) => {
+  try {
+    const totalChangeRequests = await Data.countDocuments({ type: 'Change Request' });
+    const totalSitemaps = await Data.countDocuments({ type: 'Sitemap' });
+    const totalCmsTrainings = await Data.countDocuments({ type: 'Cms Training' });
+
+    const summary = {
+      totalChangeRequests,
+      totalSitemaps,
+      totalCmsTrainings
+    };
+
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch summary' });
+  }
+};
+
+export const editData = async (req, res) => {
+  const { id, name, category, month, saleStatus } = req.body;
+
+  try {
+    const updatedData = await Data.findByIdAndUpdate(
+      id,
+      {
         name: name.toUpperCase(),
         category,
         month,
-        year: new Date().getFullYear(),
-        saleStatus: type === 'Sitemap' ? saleStatus : null
-    };
+        saleStatus
+      },
+      { new: true }
+    );
 
-    switch (type) {
-        case 'Change Request':
-            data.changeRequests.push(newEntry);
-            break;
-        case 'Sitemap':
-            data.sitemaps.push(newEntry);
-            break;
-        case 'Cms Training':
-            data.cmsTrainings.push(newEntry);
-            break;
+    if (!updatedData) {
+      return res.status(404).json({ error: 'Data not found' });
     }
 
-    saveData(data);
-    res.json({ message: 'เพิ่มข้อมูลสำเร็จ!', data: newEntry });
+    res.json({ message: 'แก้ไขข้อมูลสำเร็จ!', data: updatedData });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to edit data' });
+  }
 };
 
-export const viewAllData = (req, res) => {
-    const data = loadData();
-    res.json(data);
-};
+export const deleteData = async (req, res) => {
+  const { id, password } = req.body;
 
-export const viewSummary = (req, res) => {
-    const data = loadData();
-    const summary = {
-        totalChangeRequests: data.changeRequests.length,
-        totalSitemaps: data.sitemaps.length,
-        totalCmsTrainings: data.cmsTrainings.length
-    };
-    res.json(summary);
-};
+  if (password !== process.env.DELETE_PASSWORD) {
+    return res.status(401).json({ error: 'รหัสผ่านไม่ถูกต้อง!' });
+  }
 
-export const editData = (req, res) => {
-    const { type, index, name, category, month, saleStatus } = req.body;
+  try {
+    const deletedData = await Data.findByIdAndDelete(id);
 
-    if (!['Change Request', 'Sitemap', 'Cms Training'].includes(type)) {
-        return res.status(400).json({ error: 'Invalid type' });
+    if (!deletedData) {
+      return res.status(404).json({ error: 'Data not found' });
     }
 
-    const data = loadData();
-    let items;
-
-    switch (type) {
-        case 'Change Request':
-            items = data.changeRequests;
-            break;
-        case 'Sitemap':
-            items = data.sitemaps;
-            break;
-        case 'Cms Training':
-            items = data.cmsTrainings;
-            break;
-    }
-
-    if (index < 0 || index >= items.length) {
-        return res.status(400).json({ error: 'Invalid index' });
-    }
-
-    const item = items[index];
-    item.name = name.toUpperCase() || item.name;
-    item.category = category || item.category;
-    item.month = month || item.month;
-
-    if (type === 'Sitemap') {
-        item.saleStatus = saleStatus || item.saleStatus;
-    }
-
-    saveData(data);
-    res.json({ message: 'แก้ไขข้อมูลสำเร็จ!', data: item });
-};
-
-export const deleteData = (req, res) => {
-    const { type, index, password } = req.body;
-
-    if (password !== process.env.DELETE_PASSWORD) {
-        return res.status(401).json({ error: 'รหัสผ่านไม่ถูกต้อง!' });
-    }
-
-    if (!['Change Request', 'Sitemap', 'Cms Training'].includes(type)) {
-        return res.status(400).json({ error: 'Invalid type' });
-    }
-
-    const data = loadData();
-    let items;
-
-    switch (type) {
-        case 'Change Request':
-            items = data.changeRequests;
-            break;
-        case 'Sitemap':
-            items = data.sitemaps;
-            break;
-        case 'Cms Training':
-            items = data.cmsTrainings;
-            break;
-    }
-
-    if (index < 0 || index >= items.length) {
-        return res.status(400).json({ error: 'Invalid index' });
-    }
-
-    items.splice(index, 1);
-    saveData(data);
     res.json({ message: 'ลบข้อมูลสำเร็จ!' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete data' });
+  }
 };
