@@ -1,49 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import Dashboard from './components/Dashboard'
-import DataTable from './components/DataTable'
+import Sidebar from './components/Sidebar'
+import Navbar from './components/Navbar'
+import LeftColumn from './components/LeftColumn'
+import RightColumn from './components/RightColumn'
 
-import './App.css' 
-
-const App = () => {
-  const [summaryData, setSummaryData] = useState({});
-  const [allData, setAllData] = useState([]);
-
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/api/view/summary');
-        const data = await response.json();
-        setSummaryData(data)
-        console.log(data)
-      } catch (error) {
-        console.error('Error fetching summary:', error)
-      };
-    };
-
-    const fetchAllData = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/api/view/all');
-        const data = await response.json();
-        setAllData(data);
-      } catch (error) {
-        console.error('Error fetching data: ', error)  ;
-      }
-    };
-
-    fetchSummary();
-    fetchAllData();
-  }, []);
-
+function App() {
   return (
-    <div className="flex flex-row gap-4 p-4 bg-gray-900 text-white h-full">
-      <div className="w-full md:w-1/2 p-4 bg-gray-800 rounded-lg shadow-md">
-        <Dashboard summaryData={summaryData} />
+    <main className="flex">
+      <Sidebar />
+      <div className="flex flex-col flex-1 relative">
+        <Navbar />
+        <div className="grid md:grid-cols-3 grid-cols-1 w-full">
+          <div className="col-span-2">
+            <LeftColumn />
+          </div>
+          <div className="w-full">
+            <RightColumn />
+          </div>
+        </div>
       </div>
-      <div className="w-full md:w-1/2 p-4 bg-gray-800 rounded-lg shadow-md">
-        <DataTable allData={allData} />
-      </div>
-    </div>
+    </main>
   );
-};
+}
 
 export default App;
