@@ -37,11 +37,11 @@ const chartdata = [
     "Change Requests": "5",
     "Sitemaps": "4",
     "CMS Trainings": 2,
-  },
+  }
 ];
 
 const dataFormatter = (number) => {
-  return "$ " + Intl.NumberFormat("us").format(number).toString();
+  return Intl.NumberFormat("us").format(number).toString();
 };
 
 const AreaChartComponent = () => {

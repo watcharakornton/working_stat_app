@@ -19,28 +19,40 @@ const data = [
     type: "Change Requests",
     category: "WD",
     month: "Jun",
-    year: "2024"
+    year: "2024",
+    saleStatus: null,
+  },
+  {
+    name: "crcsports",
+    type: "Sitemaps",
+    category: "WD",
+    month: "Jul",
+    year: "2024",
+    saleStatus: "Yes",
   },
   {
     name: "KEX: Change company's name",
     type: "Change Requests",
     category: "WD",
     month: "Jun",
-    year: "2024"
+    year: "2024",
+    saleStatus: null,
   },
   {
     name: "KEX: Change company's name",
     type: "Change Requests",
     category: "WD",
     month: "Jun",
-    year: "2024"
+    year: "2024",
+    saleStatus: null,
   },
   {
     name: "KEX: Change company's name",
     type: "Change Requests",
     category: "WD",
     month: "Jun",
-    year: "2024"
+    year: "2024",
+    saleStatus: null,
   },
 ];
 
@@ -54,6 +66,7 @@ const TableComponent = () => {
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Type</TableHeaderCell>
             <TableHeaderCell>Category</TableHeaderCell>
+            <TableHeaderCell>Sale Status</TableHeaderCell>
             <TableHeaderCell>Month</TableHeaderCell>
             <TableHeaderCell>Year</TableHeaderCell>
           </TableRow>
@@ -67,6 +80,9 @@ const TableComponent = () => {
               </TableCell>
               <TableCell>
                 <Text>{item.category}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{item.saleStatus}</Text>
               </TableCell>
               <TableCell>
                 <Text>{item.month}</Text>

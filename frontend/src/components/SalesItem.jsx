@@ -103,7 +103,7 @@ const SalesItem = () => {
                   <Text>{stock.name}</Text>
                   <Flex className="space-x-2" justifyContent="end">
                     <Text>
-                      $ {Intl.NumberFormat("us").format(stock.value).toString}
+                      {Intl.NumberFormat("us").format(stock.value).toString}
                     </Text>
                   </Flex>
                 </ListItem>
