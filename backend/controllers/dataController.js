@@ -105,7 +105,7 @@ export const viewSummary = async (req, res) => {
   try {
     const totalChangeRequests = await Data.countDocuments({ type: 'Change Request' });
     const totalSitemaps = await Data.countDocuments({ type: 'Sitemap' });
-    const totalCmsTrainings = await Data.countDocuments({ type: 'Cms Training' });
+    const totalCmsTrainings = await Data.countDocuments({ type: 'CMS Training' });
 
     const summary = {
       totalChangeRequests,
@@ -182,7 +182,7 @@ export const viewSummaryByMonth = async (req, res) => {
           "CMS Trainings": {
             $let: {
               vars: {
-                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Cms Training"] } } }, 0 ] },
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "CMS Training"] } } }, 0 ] },
               },
               in: { $ifNull: [ "$$item.count", 0 ] },
             },
@@ -292,7 +292,7 @@ export const viewTotalByMonth = async (req, res) => {
           "CMS Trainings": {
             $let: {
               vars: {
-                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Cms Training"] } } }, 0 ] },
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "CMS Training"] } } }, 0 ] },
               },
               in: { $ifNull: [ "$$item.count", 0 ] },
             },

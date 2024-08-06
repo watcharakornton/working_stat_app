@@ -26,7 +26,7 @@ const AreaChartComponent = () => {
   return (
     <>
       <Card className="mt-4">
-        <Title>Area Chart Working Stats</Title>
+        <Title>Total by month</Title>
         <AreaChart
           className="h-72 mt-4"
           data={result}

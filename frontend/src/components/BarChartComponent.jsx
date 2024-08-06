@@ -22,7 +22,7 @@ const BarChartComponent = () => {
   return (
     <>
       <Card className="mt-4">
-        <Title>Bar Chart Working Stats</Title>
+        <Title>Summary by month</Title>
         <BarChart
           className="h-72 mt-4"
           data={result}
