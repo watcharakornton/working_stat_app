@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title } from "@tremor/react";
+import { getData } from '../api/api';
 import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { getData } from '../api/api';
 
 const TableComponent = () => {
   const [result, setResult] = useState([]);
@@ -14,18 +14,21 @@ const TableComponent = () => {
     const fetchData = async () => {
       try {
         const response = await getData('/view/all');
+        console.log('API response:', response);
         setResult(response);
       } catch (err) {
-        setError(err);
+        console.error('Error fetching data: ', err);
       }
     };
     fetchData();
   }, []);
 
+  // Calculate the items to display on the current page
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = result.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Handle page change
   const handlePageChange = (selectedPage) => {
     setCurrentPage(selectedPage.selected);
   };
@@ -87,7 +90,6 @@ const TableComponent = () => {
             breakClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer"
             breakLinkClassName="text-white"
             activeClassName="bg-[#334155] text-white"
-            activeLinkClassName="text-white" // Ensure the active page number is also clickable
           />
         </div>
       </div>

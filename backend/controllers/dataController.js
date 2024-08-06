@@ -25,9 +25,76 @@ export const addData = async (req, res) => {
   }
 };
 
+export const addMultipleData = async (req, res) => {
+  const dataEntries = req.body.dataEntries;
+
+  // Validate input
+  if (!Array.isArray(dataEntries) || dataEntries.length === 0) {
+    return res.status(400).json({ error: 'Invalid data entries' });
+  }
+
+  try {
+    // Prepare the data for insertion
+    const entriesToInsert = dataEntries.map(entry => ({
+      type: entry.type,
+      name: entry.name.toUpperCase(),
+      category: entry.category,
+      month: entry.month,
+      year: entry.year || new Date().getFullYear(), // Use provided year or current year
+      saleStatus: entry.type === 'Sitemap' ? entry.saleStatus : null
+    }));
+
+    // Insert multiple documents
+    const result = await Data.insertMany(entriesToInsert);
+
+    res.json({ message: 'Data added successfully!', data: result });
+  } catch (error) {
+    console.error('Error adding multiple data entries', error);
+    res.status(500).json({ error: 'Failed to add multiple data entries' });
+  }
+};
+
 export const viewAllData = async (req, res) => {
   try {
-    const data = await Data.find();
+    const data = await Data.aggregate([
+      {
+        $addFields: {
+          monthIndex: {
+            $indexOfArray: [
+              ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+              "$month"
+            ]
+          },
+          typeIndex: {
+            $indexOfArray: [
+              ["Change Request", "Sitemap", "Cms Training"],
+              "$type"
+            ]
+          },
+          wdIrIndex: {
+            $indexOfArray: [
+              ["WD", "IR"],
+              "$category" // Assuming the category field indicates WD or IR
+            ]
+          }
+        }
+      },
+      {
+        $sort: {
+          monthIndex: 1,   // จัดเรียงตามเดือน
+          typeIndex: 1,    // จัดเรียงตามประเภทงาน
+          wdIrIndex: 1,    // จัดเรียงตามประเภทภายใน WD หรือ IR
+        }
+      },
+      {
+        $project: {
+          monthIndex: 0,
+          typeIndex: 0,
+          wdIrIndex: 0
+        }
+      }
+    ]);
+
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch data' });
@@ -52,9 +119,10 @@ export const viewSummary = async (req, res) => {
   }
 };
 
-export const viewDataByCategory = async (req, res) => {
+export const viewSummaryByMonth = async (req, res) => {
   try {
-    const summary = await Data.aggregate([
+    // Aggregate to calculate the monthly summary
+    const monthlySummary = await Data.aggregate([
       {
         $group: {
           _id: {
@@ -67,11 +135,13 @@ export const viewDataByCategory = async (req, res) => {
       },
       {
         $group: {
-          _id: '$_id.type',
+          _id: {
+            month: '$_id.month',
+            year: '$_id.year',
+          },
           data: {
             $push: {
-              month: '$_id.month',
-              year: '$_id.year',
+              type: '$_id.type',
               count: '$count',
             },
           },
@@ -79,14 +149,170 @@ export const viewDataByCategory = async (req, res) => {
       },
       {
         $project: {
-          type: '$_id',
-          data: 1,
           _id: 0,
+          month: {
+            $indexOfArray: [
+              ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+              "$_id.month"
+            ]
+          },
+          year: "$_id.year",
+          date: { $concat: [ { $substr: ["$_id.month", 0, 3] }, " ", { $substr: ["$_id.year", 2, 2] } ] },
+          data: 1,
+        },
+      },
+      {
+        $addFields: {
+          "Change Requests": {
+            $let: {
+              vars: {
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Change Request"] } } }, 0 ] },
+              },
+              in: { $ifNull: [ "$$item.count", 0 ] },
+            },
+          },
+          "Sitemaps": {
+            $let: {
+              vars: {
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Sitemap"] } } }, 0 ] },
+              },
+              in: { $ifNull: [ "$$item.count", 0 ] },
+            },
+          },
+          "CMS Trainings": {
+            $let: {
+              vars: {
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Cms Training"] } } }, 0 ] },
+              },
+              in: { $ifNull: [ "$$item.count", 0 ] },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          data: 0,
+        },
+      },
+      {
+        $sort: {
+          year: 1,     // จัดเรียงตามปี
+          month: 1,    // จัดเรียงตามเดือน
         },
       },
     ]);
 
-    res.json(summary)
+    // Calculate cumulative data
+    const cumulativeData = [];
+    let cumulative = {
+      "Change Requests": 0,
+      "Sitemaps": 0,
+      "CMS Trainings": 0,
+    };
+
+    for (const entry of monthlySummary) {
+      cumulative["Change Requests"] += entry["Change Requests"];
+      cumulative["Sitemaps"] += entry["Sitemaps"];
+      cumulative["CMS Trainings"] += entry["CMS Trainings"];
+
+      cumulativeData.push({
+        date: entry.date,
+        "Change Requests": cumulative["Change Requests"],
+        "Sitemaps": cumulative["Sitemaps"],
+        "CMS Trainings": cumulative["CMS Trainings"],
+      });
+    }
+
+    res.json(cumulativeData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const viewTotalByMonth = async (req, res) => {
+  try {
+    // ใช้ Aggregation เพื่อคำนวณจำนวนข้อมูลรายเดือน
+    const monthlySummary = await Data.aggregate([
+      {
+        $group: {
+          _id: {
+            type: '$type',
+            month: '$month',
+            year: '$year',
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: '$_id.month',
+            year: '$_id.year',
+          },
+          data: {
+            $push: {
+              type: '$_id.type',
+              count: '$count',
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: {
+            $indexOfArray: [
+              ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+              "$_id.month"
+            ]
+          },
+          year: "$_id.year",
+          date: { $concat: [ { $substr: ["$_id.month", 0, 3] }, " ", { $substr: ["$_id.year", 2, 2] } ] },
+          data: 1,
+        },
+      },
+      {
+        $addFields: {
+          "Change Requests": {
+            $let: {
+              vars: {
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Change Request"] } } }, 0 ] },
+              },
+              in: { $ifNull: [ "$$item.count", 0 ] },
+            },
+          },
+          "Sitemaps": {
+            $let: {
+              vars: {
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Sitemap"] } } }, 0 ] },
+              },
+              in: { $ifNull: [ "$$item.count", 0 ] },
+            },
+          },
+          "CMS Trainings": {
+            $let: {
+              vars: {
+                item: { $arrayElemAt: [ { $filter: { input: "$data", as: "item", cond: { $eq: ["$$item.type", "Cms Training"] } } }, 0 ] },
+              },
+              in: { $ifNull: [ "$$item.count", 0 ] },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          data: 0,
+        },
+      },
+      {
+        $sort: {
+          year: 1,     // จัดเรียงตามปี
+          month: 1,    // จัดเรียงตามเดือน
+        },
+      },
+    ]);
+
+    res.json(monthlySummary);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -139,5 +365,27 @@ export const deleteData = async (req, res) => {
   } catch (error) {
     console.error('Error deleting data', error);
     res.status(500).json({ error: 'Failed to delete data' });
+  }
+};
+
+export const deleteAllData = async (req, res) => {
+  const { password } = req.body;
+
+  try {
+    // Get valid passwords from the database
+    const validPasswords = await Password.find();
+    const passwordExists = validPasswords.some(pwd => pwd.password === password);
+
+    if (!passwordExists) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // Delete all documents in the Data collection
+    await Data.deleteMany({});
+
+    res.json({ message: 'All data has been successfully deleted!' });
+  } catch (error) {
+    console.error('Error deleting all data', error);
+    res.status(500).json({ error: 'Failed to delete all data' });
   }
 };

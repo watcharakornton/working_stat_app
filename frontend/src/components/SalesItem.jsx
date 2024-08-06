@@ -20,6 +20,7 @@ import {
   ArrowRightIcon,
   ChartPieIcon,
   ViewListIcon,
+  PresentationChartLineIcon
 } from '@heroicons/react/outline';
 
 const stocks = [
@@ -69,7 +70,7 @@ const SalesItem = () => {
         <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
           <TabList variant="solid">
             <Tab icon={ChartPieIcon}>Chart</Tab>
-            <Tab icon={ViewListIcon}>List</Tab>
+            <Tab icon={PresentationChartLineIcon}>Line</Tab>
           </TabList>
         </TabGroup>
       </Flex>

@@ -4,6 +4,7 @@ import CardItem from './CardItem'
 import BarChartComponent from './BarChartComponent'
 import AreaChartComponent from './AreaChartComponent'
 import TableComponent from './TableComponent'
+import { getData } from '../api/api'
 
 const LeftColumn = () => {
   const [data, setData] = useState(null);
@@ -12,8 +13,8 @@ const LeftColumn = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/view/summary');
-        setData(response.data)
+        const response = await getData('/view/summary');
+        setData(response)
       } catch (err) {
         setError(err);
       }
