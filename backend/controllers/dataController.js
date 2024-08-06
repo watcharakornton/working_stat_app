@@ -52,6 +52,46 @@ export const viewSummary = async (req, res) => {
   }
 };
 
+export const viewDataByCategory = async (req, res) => {
+  try {
+    const summary = await Data.aggregate([
+      {
+        $group: {
+          _id: {
+            type: '$type',
+            month: '$month',
+            year: '$year',
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id.type',
+          data: {
+            $push: {
+              month: '$_id.month',
+              year: '$_id.year',
+              count: '$count',
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          type: '$_id',
+          data: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    res.json(summary)
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const editData = async (req, res) => {
   const { id, name, category, month, saleStatus } = req.body;
 
