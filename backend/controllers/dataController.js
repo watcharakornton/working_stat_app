@@ -4,7 +4,7 @@ import Password from '../models/passwordModel.js';
 export const addData = async (req, res) => {
     const { type, name, category, month, saleStatus } = req.body;
 
-    if (!['Change Request', 'Sitemap', 'Cms Training'].includes(type)) {
+    if (!['Change Request', 'Sitemap', 'CMS Training'].includes(type)) {
         return res.status(400).json({ error: 'Invalid type' });
     }
     
