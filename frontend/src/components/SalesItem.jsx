@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
-  BadgeDelta,
   Button,
   Card,
   DonutChart,
@@ -12,116 +11,75 @@ import {
   Divider,
   List,
   ListItem,
-  Metric,
   Text,
   Title,
 } from '@tremor/react';
-import {
-  ArrowRightIcon,
-  ChartPieIcon,
-  ViewListIcon,
-  PresentationChartLineIcon
-} from '@heroicons/react/outline';
-
-const stocks = [
-  {
-    name: "Off Running AG",
-    value: 10456,
-    performance: "6.1%",
-    deltaType: "increase",
-  },
-  {
-    name: "Not Normal Inc.",
-    value: 5789,
-    performance: "1.2%",
-    deltaType: "moderateDecrease",
-  },
-  {
-    name: "Logibling Inc.",
-    value: 4367,
-    performance: "2.3%",
-    deltaType: "moderateIncrease",
-  },
-  {
-    name: "Raindrop Inc.",
-    value: 3421,
-    performance: "0.5%",
-    deltaType: "moderateDecrease",
-  },
-  {
-    name: "Mwatch Group",
-    value: 1432,
-    performance: "3.4%",
-    deltaType: "decrease",
-  },
-];
+import { ChartPieIcon } from '@heroicons/react/outline';
+import { getData } from '../api/api';
 
 const dataFormatter = (number) => {
-  return "$" + Intl.NumberFormat("us").format(number).toString();
+  return Intl.NumberFormat("us").format(number).toString();
 };
 
 const SalesItem = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [result, setResult] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getData('/view/summary-type');
+        setResult(response);
+      } catch (err) {
+        setError(err);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   return (
-    <Card className="max-w-full mx-auto">
+    <Card className="max-w-full mx-auto" decoration="top" decorationColor="slate">
       <Flex className="space-x-8 flex-col lg:flex-row">
         <Title>Overview</Title>
         <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
           <TabList variant="solid">
-            <Tab icon={ChartPieIcon}>Chart</Tab>
-            <Tab icon={PresentationChartLineIcon}>Line</Tab>
+            <Tab icon={ChartPieIcon}>Donut</Tab>
+            <Tab icon={ChartPieIcon}>Pie</Tab>
           </TabList>
         </TabGroup>
       </Flex>
-      <Text className="mt-8">Portfolio Value</Text>
-      <Metric>$ 25,465</Metric>
       <Divider />
-      <Text className="mt-8">
-        <Bold>Asset Allocation</Bold>
-      </Text>
-      <Text>1 Asset class - 5 Holdings</Text>
+      <Flex justifyContent="between">
+        {result.map((item, index) => (
+          <Text key={index}>{item.name}: {item.value}</Text>
+        ))}
+      </Flex>
+      <Divider />
       {selectedIndex === 0 ? (
         <DonutChart
-          data={stocks}
+          data={result}
+          variant="donut"
           valueFormatter={dataFormatter}
           showAnimation={false}
           category="value"
           index="name"
           className="mt-6"
+          colors={['indigo', 'cyan', 'fuchsia']}
         />
       ) : (
-          <>
-            <Flex className="mt-8" justifyContent="between">
-              <Text class="truncate">
-                <Bold>Stocks</Bold>
-              </Text>
-              <Text>Since transaction</Text>
-            </Flex>
-            <List className="mt-4">
-              {stocks.map((stock) => (
-                <ListItem key={stock.name}>
-                  <Text>{stock.name}</Text>
-                  <Flex className="space-x-2" justifyContent="end">
-                    <Text>
-                      {Intl.NumberFormat("us").format(stock.value).toString}
-                    </Text>
-                  </Flex>
-                </ListItem>
-              ))}
-            </List>
-          </>
+        <DonutChart
+          data={result}
+          variant="pie"
+          valueFormatter={dataFormatter}
+          showAnimation={false}
+          category="value"
+          index="name"
+          className="mt-6"
+          colors={['indigo', 'cyan', 'fuchsia']}
+        />
       )}
-      <Flex className="mt-6 pt-4 border-t">
-        <Button
-          size="xs"
-          variant="light"
-          icon={ArrowRightIcon}
-          iconPosition="right"
-        >
-          View more
-        </Button>
-      </Flex>
     </Card>
   );
 };

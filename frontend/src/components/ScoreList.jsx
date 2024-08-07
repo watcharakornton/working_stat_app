@@ -1,5 +1,6 @@
-import React from 'react';
-import { Card, List, ListItem, Title } from '@tremor/react';
+import React, { useState, useEffect } from 'react';
+import { Divider, Card, Flex, List, Bold, ListItem, Title, Text } from '@tremor/react';
+import { getData } from '../api/api';
 
 const cities = [
   {
@@ -29,14 +30,32 @@ const cities = [
 ]
 
 const ScoreList = () => {
+  const [result, setResult] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getData('/view/summary-type-category');
+        console.log(response)
+        setResult(response);
+      } catch (err) {
+        setError(err);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   return (
     <Card className="max-w-full">
-      <Title>Tremor's Hometowns</Title>
+      <Title>Overview</Title>
+      <Divider>by Category</Divider>
       <List>
-        {cities.map((item) => (
-          <ListItem key={item.city}>
-            <span>{item.city}</span>
-            <span>{item.rating}</span>
+        {result.map((item, index) => (
+          <ListItem key={index}>
+            <span>{item.name} [WD:IR]</span>
+            <span>{item.value_wd} : {item.value_ir}</span>
           </ListItem>
         ))}
       </List>

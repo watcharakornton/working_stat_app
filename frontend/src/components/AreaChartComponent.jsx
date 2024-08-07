@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Title, AreaChart } from "@tremor/react";
+import { Card, Title, AreaChart, Divider } from "@tremor/react";
 import { getData } from '../api/api'
 
 const dataFormatter = (number) => {
@@ -25,8 +25,9 @@ const AreaChartComponent = () => {
 
   return (
     <>
-      <Card className="mt-4">
-        <Title>Total by month</Title>
+      <Card className="mt-4" decoration="top" decorationColor="slate">
+        <Title className="text-xl">Total by month</Title>
+        <Divider />
         <AreaChart
           className="h-72 mt-4"
           data={result}

@@ -1,8 +1,7 @@
 import React from 'react';
 import SalesItem from './SalesItem'
-import WebAnalytics from './WebAnalytics'
 import ScoreList from './ScoreList'
-import TableComponent from './TableComponent'
+import WebAnalytics from './WebAnalytics'
 
 const RightColumn = () => {
   return (

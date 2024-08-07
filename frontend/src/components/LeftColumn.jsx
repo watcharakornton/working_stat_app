@@ -3,6 +3,7 @@ import axios from 'axios';
 import CardItem from './CardItem'
 import BarChartComponent from './BarChartComponent'
 import AreaChartComponent from './AreaChartComponent'
+import LineChartComponent from './LineChartComponent'
 import TableComponent from './TableComponent'
 import { getData } from '../api/api'
 
@@ -34,12 +35,13 @@ const LeftColumn = () => {
   return (
     <div className="w-full flex flex-col justify-between p-2">
       <div className="flex flex-col lg:flex-row gap-2 w-full">
-        <CardItem title={"Change Requests"} data={data.totalChangeRequests}/>
-        <CardItem title={"Sitemaps"} data={data.totalSitemaps}/>
-        <CardItem title={"CMS Trainings"} data={data.totalCmsTrainings}/>
+        <CardItem title={"Change Requests"} data={data.totalChangeRequests} decorationColor="indigo" />
+        <CardItem title={"Sitemaps"} data={data.totalSitemaps} decorationColor="cyan" />
+        <CardItem title={"CMS Trainings"} data={data.totalCmsTrainings} decorationColor="fuchsia" />
       </div>
       <div className="flex-auto w-full">
         <BarChartComponent />
+        <LineChartComponent />
         <AreaChartComponent />
         <TableComponent />
       </div>

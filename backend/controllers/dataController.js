@@ -318,6 +318,113 @@ export const viewTotalByMonth = async (req, res) => {
   }
 };
 
+export const viewSummaryByType = async (req, res) => {
+  try {
+    // ใช้ Aggregation เพื่อคำนวณจำนวนรวมของแต่ละประเภท
+    const summaryByType = await Data.aggregate([
+      {
+        $group: {
+          _id: "$type",
+          total: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          name: "$_id",
+          value: "$total"
+        }
+      }
+    ]);
+
+    // ลำดับที่ต้องการ
+    const order = ["Change Request", "Sitemap", "CMS Training"];
+
+    // แปลงชื่อให้ตรงตามที่ต้องการ
+    const formattedSummary = summaryByType.map(entry => {
+      let formattedName = entry.name;
+
+      if (entry.name === "CMS Training") {
+        formattedName = "CMS Training";
+      } else if (entry.name === "Change Request") {
+        formattedName = "Change Request";
+      } else if (entry.name === "Sitemap") {
+        formattedName = "Sitemap";
+      }
+
+      return {
+        name: formattedName,
+        value: entry.value
+      };
+    });
+
+    // จัดเรียงข้อมูลตามลำดับที่กำหนด
+    const sortedSummary = formattedSummary.sort((a, b) => {
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+
+    // ส่งผลลัพธ์ที่เรียงตามลำดับที่กำหนด
+    res.json(sortedSummary);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const viewSummaryByTypeAndCategory = async (req, res) => {
+  try {
+    // ใช้ Aggregation เพื่อคำนวณจำนวนรวมของแต่ละประเภท และแยกตามหมวดหมู่
+    const summaryByType = await Data.aggregate([
+      {
+        $group: {
+          _id: { type: "$type", category: "$category" },
+          total: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: "$_id.type",
+          value_wd: {
+            $sum: {
+              $cond: [{ $eq: ["$_id.category", "WD"] }, "$total", 0]
+            }
+          },
+          value_ir: {
+            $sum: {
+              $cond: [{ $eq: ["$_id.category", "IR"] }, "$total", 0]
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          name: "$_id",
+          value_wd: 1,
+          value_ir: 1
+        }
+      },
+      {
+        $sort: {
+          name: 1 // จัดเรียงตามชื่อประเภท
+        }
+      }
+    ]);
+
+    // ลำดับที่ต้องการ
+    const order = ["Change Request", "Sitemap", "CMS Training"];
+
+    // จัดเรียงข้อมูลตามลำดับที่กำหนด
+    const sortedSummary = summaryByType.sort((a, b) => {
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+
+    // ส่งผลลัพธ์ที่เรียงตามลำดับที่กำหนด
+    res.json(sortedSummary);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const editData = async (req, res) => {
   const { id, name, category, month, saleStatus } = req.body;
 

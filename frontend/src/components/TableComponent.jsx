@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title } from "@tremor/react";
+import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title, Divider } from "@tremor/react";
 import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getData } from '../api/api';
@@ -31,17 +31,18 @@ const TableComponent = () => {
   };
 
   return (
-    <Card className="mt-4">
-      <Title>All working data</Title>
+    <Card className="mt-4" decoration="top" decorationColor="slate">
+      <Title className="text-center text-2xl text-slate-500">All working data</Title>
+      <Divider />
       <Table className="mt-5">
         <TableHead>
           <TableRow>
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Type</TableHeaderCell>
             <TableHeaderCell>Category</TableHeaderCell>
-            <TableHeaderCell>Sale Status</TableHeaderCell>
             <TableHeaderCell>Month</TableHeaderCell>
             <TableHeaderCell>Year</TableHeaderCell>
+            <TableHeaderCell>Sale Status</TableHeaderCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -55,13 +56,13 @@ const TableComponent = () => {
                 <Text>{item.category}</Text>
               </TableCell>
               <TableCell>
-                <Text>{item.saleStatus}</Text>
-              </TableCell>
-              <TableCell>
                 <Text>{item.month}</Text>
               </TableCell>
               <TableCell>
                 <Text>{item.year}</Text>
+              </TableCell>
+              <TableCell>
+                <Text>{item.saleStatus}</Text>
               </TableCell>
             </TableRow>
           ))}
