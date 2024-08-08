@@ -4,7 +4,6 @@ import CardItem from './CardItem'
 import BarChartComponent from './BarChartComponent'
 import AreaChartComponent from './AreaChartComponent'
 import LineChartComponent from './LineChartComponent'
-import TableComponent from './TableComponent'
 import { getData } from '../api/api'
 
 const LeftColumn = () => {
@@ -41,9 +40,7 @@ const LeftColumn = () => {
       </div>
       <div className="flex-auto w-full">
         <BarChartComponent />
-        <LineChartComponent />
         <AreaChartComponent />
-        <TableComponent />
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import {
   ChartBarIcon,
   CodeIcon,
   TableIcon,
+  ChartSquareBarIcon
 } from "@heroicons/react/solid";
 
 const Sidebar = () => {
@@ -14,10 +15,18 @@ const Sidebar = () => {
         <CodeIcon width={40} className="text-gray-300 left-3 sm:left-6 fixed" />
       </div>
       <div className="fixed left-3 sm:left-6 top-[100px]">
-        <TableIcon
-          width={40}
-          className="bg-slate-600 hover:bg-slate-500 p-2 rounded-lg mb-4 text-gray-300"
-        />
+        <a href="/">
+          <ChartSquareBarIcon
+            width={40}
+            className="bg-slate-600 hover:bg-slate-500 p-2 rounded-lg mb-4 text-gray-300"
+          />
+        </a>
+        <a href="/table">
+          <TableIcon
+            width={40}
+            className="bg-slate-600 hover:bg-slate-500 p-2 rounded-lg mb-4 text-gray-300"
+          />
+        </a>
       </div>
       <div className="fixed bottom-4 left-3 sm:left-6">
         <a href="#top">

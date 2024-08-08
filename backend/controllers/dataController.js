@@ -370,10 +370,10 @@ export const viewSummaryByType = async (req, res) => {
   }
 };
 
-export const viewSummaryByTypeAndCategory = async (req, res) => {
+export const viewCategoryOfType = async (req, res) => {
   try {
-    // ใช้ Aggregation เพื่อคำนวณจำนวนรวมของแต่ละประเภท และแยกตามหมวดหมู่
-    const summaryByType = await Data.aggregate([
+    // Aggregate to calculate the total count by type and category
+    const summaryByTypeAndCategory = await Data.aggregate([
       {
         $group: {
           _id: { type: "$type", category: "$category" },
@@ -383,14 +383,10 @@ export const viewSummaryByTypeAndCategory = async (req, res) => {
       {
         $group: {
           _id: "$_id.type",
-          value_wd: {
-            $sum: {
-              $cond: [{ $eq: ["$_id.category", "WD"] }, "$total", 0]
-            }
-          },
-          value_ir: {
-            $sum: {
-              $cond: [{ $eq: ["$_id.category", "IR"] }, "$total", 0]
+          categoryCounts: {
+            $push: {
+              category: "$_id.category",
+              total: "$total"
             }
           }
         }
@@ -399,8 +395,65 @@ export const viewSummaryByTypeAndCategory = async (req, res) => {
         $project: {
           _id: 0,
           name: "$_id",
-          value_wd: 1,
-          value_ir: 1
+          categoryCounts: 1
+        }
+      },
+      {
+        $addFields: {
+          "WD": {
+            $let: {
+              vars: {
+                wdCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "WD"] } } }, 0 ] }
+              },
+              in: { $ifNull: [ "$$wdCount.total", 0 ] }
+            }
+          },
+          "IR": {
+            $let: {
+              vars: {
+                irCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "IR"] } } }, 0 ] }
+              },
+              in: { $ifNull: [ "$$irCount.total", 0 ] }
+            }
+          },
+          "WD/IR": {
+            $let: {
+              vars: {
+                wdCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "WD"] } } }, 0 ] },
+                irCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "IR"] } } }, 0 ] }
+              },
+              in: { $sum: [ { $ifNull: [ "$$wdCount.total", 0 ] }, { $ifNull: [ "$$irCount.total", 0 ] } ] }
+            }
+          },
+          "INT": {
+            $let: {
+              vars: {
+                intCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "INT"] } } }, 0 ] }
+              },
+              in: { $ifNull: [ "$$intCount.total", 0 ] }
+            }
+          },
+          "CSR": {
+            $let: {
+              vars: {
+                csrCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "CSR"] } } }, 0 ] }
+              },
+              in: { $ifNull: [ "$$csrCount.total", 0 ] }
+            }
+          },
+          "SD": {
+            $let: {
+              vars: {
+                sdCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "SD"] } } }, 0 ] }
+              },
+              in: { $ifNull: [ "$$sdCount.total", 0 ] }
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          categoryCounts: 0
         }
       },
       {
@@ -410,16 +463,7 @@ export const viewSummaryByTypeAndCategory = async (req, res) => {
       }
     ]);
 
-    // ลำดับที่ต้องการ
-    const order = ["Change Request", "Sitemap", "CMS Training"];
-
-    // จัดเรียงข้อมูลตามลำดับที่กำหนด
-    const sortedSummary = summaryByType.sort((a, b) => {
-      return order.indexOf(a.name) - order.indexOf(b.name);
-    });
-
-    // ส่งผลลัพธ์ที่เรียงตามลำดับที่กำหนด
-    res.json(sortedSummary);
+    res.json(summaryByTypeAndCategory);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

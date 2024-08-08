@@ -1,14 +1,14 @@
 import React from 'react';
 import PieChartComponent from './PieChartComponent'
 import BarListComponent from './BarListComponent'
-import ListItemComponent from './ListItemComponent'
+import BarChartTwoComponet from './BarChartTwoComponent'
 
 const RightColumn = () => {
   return (
-    <div className="w-full p-2">
+    <div className="w-full p-2 mr-5">
       <PieChartComponent />
       <BarListComponent />
-      <ListItemComponent />
+      <BarChartTwoComponet />
     </div>
   );
 };

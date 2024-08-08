@@ -6,8 +6,8 @@ import {
 	viewSummary,
   viewSummaryByMonth,
   viewSummaryByType,
-  viewSummaryByTypeAndCategory,
   viewTotalByMonth,
+  viewCategoryOfType,
 	editData,
 	deleteData,
   deleteAllData
@@ -21,8 +21,8 @@ router.get('/view/all', viewAllData);
 router.get('/view/summary', viewSummary);
 router.get('/view/summary-month', viewSummaryByMonth);
 router.get('/view/summary-type', viewSummaryByType);
-router.get('/view/summary-type-category', viewSummaryByTypeAndCategory);
 router.get('/view/total-month', viewTotalByMonth);
+router.get('/view/category-type', viewCategoryOfType);
 router.put('/edit', editData);
 router.delete('/delete', deleteData);
 router.delete('/delete-all', deleteAllData);
