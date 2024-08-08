@@ -1,20 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text, Title, Divider } from "@tremor/react";
+import {
+  Card,
+  Table,
+  TableHead,
+  TableRow,
+  TableHeaderCell,
+  TableBody,
+  TableCell,
+  Text,
+  Title,
+  Divider,
+  Select,
+  SelectItem
+} from "@tremor/react";
 import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getData } from '../api/api';
 
 const TableComponent = () => {
   const [result, setResult] = useState([]);
+  const [filteredResult, setFilteredResult] = useState([]);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage] = useState(10);
+  const [typeFilter, setTypeFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [monthFilter, setMonthFilter] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getData('/view/all');
         setResult(response);
+        setFilteredResult(response);  // Set initial filtered result
       } catch (err) {
         setError(err);
       }
@@ -22,9 +40,49 @@ const TableComponent = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    let filtered = result;
+
+    if (typeFilter) {
+      filtered = filtered.filter(item => item.type === typeFilter);
+    }
+
+    if (categoryFilter) {
+      filtered = filtered.filter(item => item.category === categoryFilter);
+    }
+
+    if (monthFilter) {
+      filtered = filtered.filter(item => item.month === monthFilter);
+    }
+
+    setFilteredResult(filtered);
+  }, [typeFilter, categoryFilter, monthFilter, result]);
+
+  // Calculate unique values for filters
+  const getUniqueValues = (field) => {
+    const uniqueValues = [...new Set(result.map(item => item[field]))];
+    return uniqueValues;
+  };
+
+  // Update options based on selected filters
+  const getFilteredOptions = (field) => {
+    let options = getUniqueValues(field);
+    if (field === 'category' && typeFilter) {
+      options = options.filter(value => result.some(item => item.type === typeFilter && item.category === value));
+    }
+    if (field === 'month' && typeFilter) {
+      options = options.filter(value => result.some(item => item.type === typeFilter && item.month === value));
+    }
+    return options;
+  };
+
+  const uniqueTypes = getUniqueValues('type');
+  const filteredCategories = getFilteredOptions('category');
+  const filteredMonths = getFilteredOptions('month');
+
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = result.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredResult.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (selectedPage) => {
     setCurrentPage(selectedPage.selected);
@@ -34,6 +92,48 @@ const TableComponent = () => {
     <Card className="mt-4" decoration="top" decorationColor="slate">
       <Title className="text-center text-2xl text-slate-500">All working data</Title>
       <Divider />
+      
+      {/* Filter Section */}
+      <div className="mb-4 p-4">
+        <div className="flex space-x-4">
+          <Select
+            placeholder="Select Type"
+            value={typeFilter}
+            onValueChange={setTypeFilter}
+            className="w-1/3"
+          >
+            <SelectItem value="">All Types</SelectItem>
+            {uniqueTypes.map(type => (
+              <SelectItem key={type} value={type}>{type}</SelectItem>
+            ))}
+          </Select>
+
+          <Select
+            placeholder="Select Category"
+            value={categoryFilter}
+            onValueChange={setCategoryFilter}
+            className="w-1/3"
+          >
+            <SelectItem value="">All Categories</SelectItem>
+            {filteredCategories.map(category => (
+              <SelectItem key={category} value={category}>{category}</SelectItem>
+            ))}
+          </Select>
+
+          <Select
+            placeholder="Select Month"
+            value={monthFilter}
+            onValueChange={setMonthFilter}
+            className="w-1/3"
+          >
+            <SelectItem value="">All Months</SelectItem>
+            {filteredMonths.map(month => (
+              <SelectItem key={month} value={month}>{month}</SelectItem>
+            ))}
+          </Select>
+        </div>
+      </div>
+
       <Table className="mt-5">
         <TableHead>
           <TableRow>
@@ -70,22 +170,22 @@ const TableComponent = () => {
       </Table>
       <div className="flex items-center justify-between mt-4">
         <p className="text-tremor-content text-sm">
-          Page <span className="font-medium">{currentPage + 1}</span> of <span className="font-medium">{Math.ceil(result.length / itemsPerPage)}</span>
+          Page <span className="font-medium">{currentPage + 1}</span> of <span className="font-medium">{Math.ceil(filteredResult.length / itemsPerPage)}</span>
         </p>
         <div className="flex space-x-2">
           <ReactPaginate
             previousLabel={<FaChevronLeft />}
             nextLabel={<FaChevronRight />}
-            pageCount={Math.ceil(result.length / itemsPerPage)}
+            pageCount={Math.ceil(filteredResult.length / itemsPerPage)}
             onPageChange={handlePageChange}
             containerClassName="flex space-x-2"
-            pageClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer"
+            pageClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer hover:bg-[#334155]"
             pageLinkClassName="text-white"
-            previousClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer"
+            previousClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer hover:bg-[#334155]"
             previousLinkClassName="text-white"
-            nextClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer"
+            nextClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer hover:bg-[#334155]"
             nextLinkClassName="text-white"
-            breakClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer"
+            breakClassName="flex items-center justify-center w-10 h-10 bg-[#1e293b] border border-[#1e293b] rounded-full cursor-pointer hover:bg-[#334155]"
             breakLinkClassName="text-white"
             activeClassName="bg-[#334155] text-white"
             activeLinkClassName="text-white" // Ensure the active page number is also clickable
