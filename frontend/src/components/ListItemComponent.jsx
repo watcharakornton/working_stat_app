@@ -21,7 +21,7 @@ const ListItemComponent = () => {
   }, []);
 
   return (
-    <Card className="max-w-full">
+    <Card className="max-w-full" decoration="top" decorationColor="slate">
       <Title>Overview</Title>
       <Divider>by Category</Divider>
       <List>
