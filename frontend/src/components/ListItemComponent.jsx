@@ -2,34 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Divider, Card, Flex, List, Bold, ListItem, Title, Text } from '@tremor/react';
 import { getData } from '../api/api';
 
-const cities = [
-  {
-    city: "Athens",
-    rating: "2 open PR",
-  },
-  {
-    city: "Luzern",
-    rating: "1 open PR",
-  },
-  {
-    city: "Zürich",
-    rating: "0 open PR",
-  },
-  {
-    city: "Vienna",
-    rating: "1 open PR",
-  },
-  {
-    city: "Ermatingen",
-    rating: "0 open PR",
-  },
-  {
-    city: "Lisbon",
-    rating: "0 open PR",
-  },
-]
-
-const ScoreList = () => {
+const ListItemComponent = () => {
   const [result, setResult] = useState([]);
   const [error, setError] = useState(null);
 
@@ -63,4 +36,4 @@ const ScoreList = () => {
   )
 }
 
-export default ScoreList;
+export default ListItemComponent;

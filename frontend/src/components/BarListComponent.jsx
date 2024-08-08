@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BarList, Card, Title, Bold, Flex, Text, Divider } from '@tremor/react';
 import { getData } from '../api/api';
 
-const WebAnalytics = () => {
+const BarListComponent = () => {
   const [result, setResult] = useState([]);
   const [error, setError] = useState(null);
 
@@ -36,4 +36,4 @@ const WebAnalytics = () => {
   );
 };
 
-export default WebAnalytics;
+export default BarListComponent;

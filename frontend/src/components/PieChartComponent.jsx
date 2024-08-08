@@ -21,7 +21,7 @@ const dataFormatter = (number) => {
   return Intl.NumberFormat("us").format(number).toString();
 };
 
-const SalesItem = () => {
+const PieChartComponent = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [result, setResult] = useState([]);
   const [error, setError] = useState(null);
@@ -84,4 +84,4 @@ const SalesItem = () => {
   );
 };
 
-export default SalesItem;
+export default PieChartComponent;
