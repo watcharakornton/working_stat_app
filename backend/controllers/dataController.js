@@ -493,7 +493,25 @@ export const editData = async (req, res) => {
   }
 };
 
-export const deleteData = async (req, res) => {
+export const deleteDataById = async (req, res) => {
+  const { id } = req.query;  // รับ ID จาก query parameter
+
+  try {
+    // ตรวจสอบการมีอยู่ของข้อมูลที่ต้องการลบ
+    const deletedData = await Data.findByIdAndDelete(id);
+
+    if (!deletedData) {
+      return res.status(404).json({ error: 'ไม่พบข้อมูลที่ต้องการลบ' });
+    }
+
+    res.json({ message: 'ลบข้อมูลสำเร็จ!' });
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการลบข้อมูล', error);
+    res.status(500).json({ error: 'ลบข้อมูลล้มเหลว' });
+  }
+};
+
+export const deleteDataWithPass = async (req, res) => {
   const { id, password } = req.body;
 
   try {

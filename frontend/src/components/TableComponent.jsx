@@ -17,7 +17,7 @@ import {
 import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getData } from '../api/api';
-import { SearchIcon } from "@heroicons/react/solid";
+import { SearchIcon, TrashIcon } from "@heroicons/react/solid";
 
 const TableComponent = () => {
   const [result, setResult] = useState([]);
@@ -169,6 +169,7 @@ const TableComponent = () => {
             <TableHeaderCell>Month</TableHeaderCell>
             <TableHeaderCell>Year</TableHeaderCell>
             <TableHeaderCell>Sale Status</TableHeaderCell>
+            <TableHeaderCell>Action</TableHeaderCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -189,6 +190,12 @@ const TableComponent = () => {
               </TableCell>
               <TableCell>
                 <Text>{item.saleStatus}</Text>
+              </TableCell>
+              <TableCell>
+                <TrashIcon
+                  width={20}
+                  className="text-red-600 hover:text-red-400 cursor-pointer"
+                />
               </TableCell>
             </TableRow>
           ))}
