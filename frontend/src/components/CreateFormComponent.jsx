@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Divider, TextInput, Select, SelectItem, Button, Title, Card } from '@tremor/react';
+import { Legend, Divider, TextInput, Select, SelectItem, Button, Title, Card } from '@tremor/react';
 import axios from 'axios';
 
 const CreateFormComponent = () => {
@@ -7,6 +7,7 @@ const CreateFormComponent = () => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [month, setMonth] = useState('');
+  const [saleStatus, setSaleStatus] = useState(''); // State สำหรับ saleStatus
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -15,17 +16,19 @@ const CreateFormComponent = () => {
       type,
       name,
       category,
-      month
+      month,
+      ...(type === 'Sitemap' && { saleStatus }) // เพิ่ม saleStatus ถ้า type เป็น 'Sitemap'
     };
 
     try {
       await axios.post('http://localhost:4000/api/add', data);
       alert('Data added successfully');
-      // SelectItemally, clear the form fields here
+      // Clear the form fields here
       setType('');
       setName('');
       setCategory('');
       setMonth('');
+      setSaleStatus('');
     } catch (error) {
       console.error('Error adding data:', error);
       alert('Failed to add data');
@@ -90,7 +93,6 @@ const CreateFormComponent = () => {
             </label>
             <Select
               id="type"
-              label={<span className="text-slate-500">Type</span>}
               value={type}
               onValueChange={setType}
               className="mt-2"
@@ -111,7 +113,6 @@ const CreateFormComponent = () => {
             </label>
             <Select
               id="category"
-              label={<span className="text-slate-500">Category</span>}
               value={category}
               onValueChange={setCategory}
               className="mt-2"
@@ -126,6 +127,27 @@ const CreateFormComponent = () => {
             </Select>
           </div>
         </div>
+        {type === 'Sitemap' && (
+          <div className="mb-4 flex-1">
+            <label
+              htmlFor="saleStatus"
+              className="text-sm text-slate-500"
+            >
+              Sale Status
+            </label>
+            <Select
+              id="saleStatus"
+              value={saleStatus}
+              onValueChange={setSaleStatus}
+              className="mt-2"
+            >
+              <SelectItem value="">Select Sale Status</SelectItem>
+              <SelectItem value="YES">YES</SelectItem>
+              <SelectItem value="NO">NO</SelectItem>
+              <SelectItem value="TBC">TBC</SelectItem>
+            </Select>
+          </div>
+        )}
 
         <Divider />
         <Button type="submit" className="float-right">Add data</Button>
