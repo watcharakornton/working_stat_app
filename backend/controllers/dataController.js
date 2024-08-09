@@ -419,10 +419,9 @@ export const viewCategoryOfType = async (req, res) => {
           "WD/IR": {
             $let: {
               vars: {
-                wdCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "WD"] } } }, 0 ] },
-                irCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "IR"] } } }, 0 ] }
+                wdIrCount: { $arrayElemAt: [ { $filter: { input: "$categoryCounts", as: "item", cond: { $eq: ["$$item.category", "WD/IR"] } } }, 0 ] }
               },
-              in: { $sum: [ { $ifNull: [ "$$wdCount.total", 0 ] }, { $ifNull: [ "$$irCount.total", 0 ] } ] }
+              in: { $ifNull: [ "$$wdIrCount.total", 0 ] }
             }
           },
           "INT": {
@@ -458,7 +457,7 @@ export const viewCategoryOfType = async (req, res) => {
       },
       {
         $sort: {
-          name: 1 // จัดเรียงตามชื่อประเภท
+          name: 1 // Sort by type name
         }
       }
     ]);
