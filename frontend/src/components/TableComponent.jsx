@@ -11,11 +11,13 @@ import {
   Title,
   Divider,
   Select,
-  SelectItem
+  SelectItem,
+  TextInput // นำเข้า TextInput สำหรับช่องค้นหา
 } from "@tremor/react";
 import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getData } from '../api/api';
+import { SearchIcon } from "@heroicons/react/solid";
 
 const TableComponent = () => {
   const [result, setResult] = useState([]);
@@ -26,6 +28,7 @@ const TableComponent = () => {
   const [typeFilter, setTypeFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [monthFilter, setMonthFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // State สำหรับค้นหา
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,16 +58,29 @@ const TableComponent = () => {
       filtered = filtered.filter(item => item.month === monthFilter);
     }
 
-    setFilteredResult(filtered);
-  }, [typeFilter, categoryFilter, monthFilter, result]);
+    // ค้นหาข้อมูลตามคำค้นหา
+    if (searchTerm) {
+      const regex = new RegExp(searchTerm, 'i');
+      filtered = filtered.filter(item =>
+        regex.test(item.name) ||
+        regex.test(item.type) ||
+        regex.test(item.category) ||
+        regex.test(item.month) ||
+        regex.test(item.year) ||
+        regex.test(item.saleStatus)
+      );
+    }
 
-  // Calculate unique values for filters
+    setFilteredResult(filtered);
+  }, [typeFilter, categoryFilter, monthFilter, searchTerm, result]);
+
+  // คำนวณค่าเฉพาะสำหรับตัวกรอง
   const getUniqueValues = (field) => {
     const uniqueValues = [...new Set(result.map(item => item[field]))];
     return uniqueValues;
   };
 
-  // Update options based on selected filters
+  // อัปเดตตัวเลือกตามตัวกรองที่เลือก
   const getFilteredOptions = (field) => {
     let options = getUniqueValues(field);
     if (field === 'category' && typeFilter) {
@@ -95,6 +111,16 @@ const TableComponent = () => {
       
       {/* Filter Section */}
       <div className="mb-4 p-4">
+        <div className="flex space-x-4 mb-4 justify-end">
+          <TextInput
+            icon={SearchIcon}
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full max-w-xs"
+          />
+        </div>
+
         <div className="flex space-x-4">
           <Select
             placeholder="Select Type"
