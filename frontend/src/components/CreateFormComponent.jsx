@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Legend, Divider, TextInput, Select, SelectItem, Button, Title, Card } from '@tremor/react';
-import axios from 'axios';
+import { postData } from '../api/api';
 
 const CreateFormComponent = () => {
   const [type, setType] = useState('');
@@ -21,7 +21,7 @@ const CreateFormComponent = () => {
     };
 
     try {
-      await axios.post('http://localhost:4000/api/add', data);
+      await postData('/add', data);
       alert('Data added successfully');
       // Clear the form fields here
       setType('');
@@ -30,7 +30,6 @@ const CreateFormComponent = () => {
       setMonth('');
       setSaleStatus('');
     } catch (error) {
-      console.error('Error adding data:', error);
       alert('Failed to add data');
     }
   };

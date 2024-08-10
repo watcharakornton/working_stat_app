@@ -493,6 +493,33 @@ export const editData = async (req, res) => {
   }
 };
 
+// Other imports and functions remain unchanged
+export const editDataByParams = async (req, res) => {
+  const { name, category, month, saleStatus } = req.body;
+  const { id } = req.query;  // Extract ID from query parameters
+
+  try {
+    const updatedData = await Data.findByIdAndUpdate(
+      id,
+      {
+        name: name ? name.toUpperCase() : undefined,
+        category: category !== undefined ? category : undefined,
+        month: month !== undefined ? month : undefined,
+        saleStatus: saleStatus !== undefined ? saleStatus : undefined
+      },
+      { new: true }
+    );
+
+    if (!updatedData) {
+      return res.status(404).json({ error: 'Data not found' });
+    }
+
+    res.json({ message: 'แก้ไขข้อมูลสำเร็จ!', data: updatedData });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to edit data' });
+  }
+};
+
 export const deleteDataById = async (req, res) => {
   const { id } = req.query;  // รับ ID จาก query parameter
 

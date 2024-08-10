@@ -16,8 +16,8 @@ import {
 } from "@tremor/react";
 import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { getData } from '../api/api';
-import { SearchIcon, TrashIcon } from "@heroicons/react/solid";
+import { getData, deleteData } from '../api/api';
+import { SearchIcon, TrashIcon, PencilAltIcon } from "@heroicons/react/solid";
 
 const TableComponent = () => {
   const [result, setResult] = useState([]);
@@ -103,6 +103,23 @@ const TableComponent = () => {
   const handlePageChange = (selectedPage) => {
     setCurrentPage(selectedPage.selected);
   };
+  
+  const handleDelete = async (id) => {
+    if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้ ?')) {
+      try {
+        await deleteData('/delete', id);
+        setResult(result.filter(item => item._id !== id));
+        setFilteredResult(filteredResult.filter(item => item._id !== id));
+      } catch (err) {
+        console.error('ไม่สามารถลบข้อมูลได้', err);
+      }
+    }
+  };
+
+  const handleEdit = (id) => {
+    window.alert('Edit item with id: ' + id);
+    console.log(id)
+  }
 
   return (
     <Card className="mt-4" decoration="top" decorationColor="slate">
@@ -191,10 +208,16 @@ const TableComponent = () => {
               <TableCell>
                 <Text>{item.saleStatus}</Text>
               </TableCell>
-              <TableCell>
+              <TableCell className="flex">
                 <TrashIcon
                   width={20}
-                  className="text-red-600 hover:text-red-400 cursor-pointer"
+                  className="mr-1 text-red-600 hover:text-red-400 cursor-pointer"
+                  onClick={() => handleDelete(item._id)}
+                />
+                <PencilAltIcon
+                  width={20}
+                  className="text-yellow-600 hover:text-yellow-400 cursor-pointer"
+                  onClick={() => handleEdit(item._id)}
                 />
               </TableCell>
             </TableRow>
