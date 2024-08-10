@@ -27,11 +27,11 @@ export const deleteData = async (path, id) => {
   }
 }
 
-export const updateData = async (path, data) => {
+export const updateData = async (path, id, data) => {
   try {
-    const response = await axios.put(`${import.meta.env.VITE_API_URL}${path}`, data);
+    const response = await axios.put(`${import.meta.env.VITE_API_URL}${path}/?id=${id}`, data);
     return response.data
   } catch (error) {
-    console.error('Error adding data: ', error);
+    console.error('Error editing data: ', error);
   }
 }

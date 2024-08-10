@@ -8,8 +8,8 @@ import {
   viewSummaryByType,
   viewTotalByMonth,
   viewCategoryOfType,
-	editData,
-  editDataByParams,
+	updateData,
+  updateDataByParams,
   deleteDataById,
 	deleteDataWithPass,
   deleteAllData
@@ -25,8 +25,8 @@ router.get('/view/summary-month', viewSummaryByMonth);
 router.get('/view/summary-type', viewSummaryByType);
 router.get('/view/total-month', viewTotalByMonth);
 router.get('/view/category-type', viewCategoryOfType);
-router.put('/edit', editDataByParams);
-router.put('/edit/body', editData);
+router.put('/update', updateDataByParams);
+router.put('/update/body', updateData);
 router.delete('/delete', deleteDataById);
 router.delete('/delete/withpass', deleteDataWithPass);
 router.delete('/delete/all', deleteAllData);

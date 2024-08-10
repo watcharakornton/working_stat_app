@@ -468,7 +468,7 @@ export const viewCategoryOfType = async (req, res) => {
   }
 };
 
-export const editData = async (req, res) => {
+export const updateData = async (req, res) => {
   const { id, name, category, month, saleStatus } = req.body;
 
   try {
@@ -494,7 +494,7 @@ export const editData = async (req, res) => {
 };
 
 // Other imports and functions remain unchanged
-export const editDataByParams = async (req, res) => {
+export const updateDataByParams = async (req, res) => {
   const { name, category, month, saleStatus } = req.body;
   const { id } = req.query;  // Extract ID from query parameters
 
