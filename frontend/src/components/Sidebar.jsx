@@ -8,6 +8,7 @@ import {
   ChartSquareBarIcon,
   PlusCircleIcon
 } from "@heroicons/react/solid";
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   return (

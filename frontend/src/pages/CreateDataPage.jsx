@@ -6,7 +6,7 @@ const CreateDataPage = () => {
   return (
     <main className="flex ">
       <Sidebar />
-      <div className="mt-5 flex flex-col mx-auto max-w-2xl flex-1 relative">
+      <div className="flex flex-col mx-auto max-w-2xl flex-1 relative">
         <CreateFormComponent />
       </div>
     </main>

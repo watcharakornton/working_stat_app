@@ -18,6 +18,7 @@ import ReactPaginate from 'react-paginate';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getData, deleteData } from '../api/api';
 import { SearchIcon, TrashIcon, PencilAltIcon } from "@heroicons/react/solid";
+import { Link , useNavigate } from 'react-router-dom';
 
 const TableComponent = () => {
   const [result, setResult] = useState([]);
@@ -116,13 +117,15 @@ const TableComponent = () => {
     }
   };
 
-  const handleEdit = (id) => {
-    window.alert('Edit item with id: ' + id);
-    console.log(id)
+  const navigate = useNavigate();
+  const handleEdit = (data) => {
+    // window.alert('Edit item with id: ' + id);
+    console.log(data)
+    // navigate(`/edit-data/${id}`);
   }
 
   return (
-    <Card className="mt-4" decoration="top" decorationColor="slate">
+    <Card className="mb-5" decoration="top" decorationColor="slate">
       <Title className="text-center text-2xl text-slate-500">All working data</Title>
       <Divider />
       
@@ -217,7 +220,7 @@ const TableComponent = () => {
                 <PencilAltIcon
                   width={20}
                   className="text-yellow-600 hover:text-yellow-400 cursor-pointer"
-                  onClick={() => handleEdit(item._id)}
+                  onClick={() => handleEdit(item)}
                 />
               </TableCell>
             </TableRow>
