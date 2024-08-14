@@ -119,9 +119,9 @@ const TableComponent = () => {
 
   const navigate = useNavigate();
   const handleEdit = (data) => {
-    // window.alert('Edit item with id: ' + id);
+    // window.alert('Edit item with item: ' + data);
     console.log(data)
-    // navigate(`/edit-data/${id}`);
+    navigate(`/edit-data`);
   }
 
   return (
