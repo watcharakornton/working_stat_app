@@ -32,6 +32,8 @@ export const updateData = async (path, id, data) => {
     const response = await axios.put(`${import.meta.env.VITE_API_URL}${path}/?id=${id}`, data);
     return response.data
   } catch (error) {
+    console.log(data)
+    console.log(id)
     console.error('Error editing data: ', error);
   }
 }

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Legend, Divider, TextInput, Select, SelectItem, Button, Title, Card } from '@tremor/react';
 import { postData } from '../api/api';
 
 const CreateFormComponent = () => {
+  const navigate = useNavigate(); // ใช้ useNavigate สำหรับการเปลี่ยนเส้นทาง
   const [type, setType] = useState('');
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
@@ -29,6 +31,8 @@ const CreateFormComponent = () => {
       setCategory('');
       setMonth('');
       setSaleStatus('');
+
+      navigate('/view-data'); // เปลี่ยนเส้นทางไปยัง /view-data หลังจากเพิ่มข้อมูลเสร็จ
     } catch (error) {
       alert('Failed to add data');
     }

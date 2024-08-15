@@ -119,9 +119,7 @@ const TableComponent = () => {
 
   const navigate = useNavigate();
   const handleEdit = (data) => {
-    // window.alert('Edit item with item: ' + data);
-    console.log(data)
-    navigate(`/edit-data`);
+    navigate(`/edit-data`, { state: { data }});
   }
 
   return (

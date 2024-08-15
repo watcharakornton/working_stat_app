@@ -14,7 +14,9 @@ const Sidebar = () => {
   return (
     <div className="bg-slate-800 flex-none w-14 sm:w-20 h-screen">
       <div className="h-20 items-center flex">
-        <CodeIcon width={40} className="text-gray-300 left-3 sm:left-6 fixed" />
+        <Link to='/'>
+          <CodeIcon width={40} className="text-gray-300 left-3 sm:left-6 fixed" />
+        </Link>
       </div>
       <div className="fixed left-3 sm:left-6 top-[100px]">
         <a href="/">
