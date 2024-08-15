@@ -3,7 +3,7 @@ import axios from 'axios';
 import CardItem from './CardItem'
 import BarChartComponent from './BarChartComponent'
 import AreaChartComponent from './AreaChartComponent'
-import LineChartComponent from './LineChartComponent'
+// import LineChartComponent from './LineChartComponent'
 import { getData } from '../api/api'
 
 const LeftColumn = () => {
